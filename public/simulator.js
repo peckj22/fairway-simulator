@@ -838,7 +838,6 @@
     // Update world rank display — use live rank for 2026, EOY for 2025, PGA stat for older
     await getOWGRCache();
     const owgrData = lookupOWGR(player.displayName);
-    console.log('OWGR lookup:', player.displayName, '→', owgrData, 'cache size:', owgrNameCache ? Object.keys(owgrNameCache).length : 0);
     let wrNum = null;
 
     if (yearInt >= 2026) {
@@ -961,7 +960,6 @@
       );
       owgrCache     = cache;
       owgrNameCache = nameCache;
-      console.log('OWGR cache loaded:', Object.keys(nameCache).length, 'players');
       return owgrCache;
     })();
     return owgrCachePromise;
@@ -1279,20 +1277,42 @@ function showDropdown(players, query) {
     if (e.target === this) document.getElementById('nodata-cancel').click();
   });
 
+
+  // ── Welcome Modal ─────────────────────────────────────────
+  (function() {
+    const overlay = document.getElementById('welcome-overlay');
+    const btn     = document.getElementById('welcome-btn');
+    if (!overlay || !btn) return;
+
+    // Check if user has seen it before using localStorage
+    const seen = localStorage.getItem('fairway-welcome-seen');
+    if (seen) {
+      overlay.classList.add('hidden');
+    }
+
+    btn.addEventListener('click', () => {
+      overlay.style.animation = 'fadeOut 0.3s ease forwards';
+      setTimeout(() => overlay.classList.add('hidden'), 280);
+      localStorage.setItem('fairway-welcome-seen', '1');
+    });
+
+    // Also close on backdrop click
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) btn.click();
+    });
+  })();
+
   // Auto-load the current world #1 player on startup
   (async () => {
     try {
       await getOWGRCache();
       // Find rank #1 in OWGR cache
-      console.log('owgrCache size:', Object.keys(owgrCache).length);
       const world1 = Object.values(owgrCache).find(p => p.rank === 1);
-      console.log('world1:', world1?.fullName);
       if (!world1) return;
       // Match to PGA Tour player list
       const match = allPlayers.find(p =>
         p.displayName.toLowerCase().trim() === world1.fullName?.toLowerCase().trim()
       );
-      console.log('match:', match?.displayName);
       if (!match) return;
       // Update name display immediately
       const names = match.displayName.split(' ');

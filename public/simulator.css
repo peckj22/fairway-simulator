@@ -1055,3 +1055,126 @@
     transition: color 0.15s;
   }
   .nodata-cancel:hover { color: var(--text); }
+  /* ── Welcome Modal ─────────────────────────────── */
+  .welcome-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(9, 16, 13, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.4s ease;
+  }
+  .welcome-overlay.hidden {
+    display: none;
+  }
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .welcome-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--green-light);
+    max-width: 520px;
+    width: calc(100% - 40px);
+    padding: 40px;
+    animation: slideUp 0.4s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(24px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .welcome-header {
+    margin-bottom: 24px;
+  }
+  .welcome-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 3px;
+    color: var(--green-light);
+  }
+  .welcome-logo em {
+    color: var(--text2);
+    font-style: normal;
+    font-size: 14px;
+    letter-spacing: 2px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .welcome-tagline {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.7;
+    margin-bottom: 12px;
+  }
+
+  .welcome-how {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .welcome-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .welcome-step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--green);
+    line-height: 1;
+    min-width: 32px;
+  }
+  .welcome-step strong {
+    display: block;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 3px;
+    letter-spacing: 0.5px;
+  }
+  .welcome-step span {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .welcome-note {
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.6;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .welcome-btn {
+    margin-top: 28px;
+    width: 100%;
+    padding: 14px;
+    background: var(--green);
+    border: none;
+    color: var(--text);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .welcome-btn:hover {
+    background: var(--green-light);
+    color: var(--bg);
+  }
