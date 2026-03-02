@@ -1,0 +1,368 @@
+<div class="app">
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">FAIRWAY <em>WHAT-IF SIMULATOR</em></div>
+    <div class="nav-right">
+      <!-- Player Search -->
+      <div class="search-wrap" id="search-wrap">
+        <div class="search-input-wrap">
+          <span class="search-icon">⌕</span>
+          <input type="text" class="search-input" id="search-input" placeholder="Search players..." autocomplete="off">
+          <button class="search-clear" id="search-clear">✕</button>
+        </div>
+        <div class="search-dropdown" id="search-dropdown"></div>
+      </div>
+      <div class="season-select-wrap">
+        <select id="season-select" class="season-select">
+          <option value="2026">2026 SEASON</option>
+          <option value="2025">2025 SEASON</option>
+          <option value="2024">2024 SEASON</option>
+          <option value="2023">2023 SEASON</option>
+          <option value="2022">2022 SEASON</option>
+          <option value="2021">2021 SEASON</option>
+          <option value="2020">2020 SEASON</option>
+          <option value="2019">2019 SEASON</option>
+        </select>
+        <span class="season-chevron">▾</span>
+      </div>
+      <button class="reset-btn" id="reset-btn">↺ RESET</button>
+    </div>
+  </nav>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- LEFT: Player -->
+    <div class="player-card">
+      <div class="player-photo">
+        <img src="/api/headshot/46046" alt="Scottie Scheffler" id="player-photo-img" onerror="this.style.display='none';this.parentElement.querySelector('.player-initials').style.display='flex'" style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;">
+        <span class="player-initials" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--green);letter-spacing:3px;">KM</span>
+        <div class="player-rank">WR —</div>
+      </div>
+      <div class="player-name"><span style="color:var(--text3);font-size:20px">Loading...</span></div>
+      <div class="player-baseline">
+        <div class="baseline-label">2026 Baseline</div>
+        <div class="baseline-stat">
+          <span class="bs-label">Scoring Avg</span>
+          <span class="bs-val" data-stat="score">70.967</span>
+        </div>
+        <div class="baseline-stat">
+          <span class="bs-label">SG: Total</span>
+          <span class="bs-val" data-stat="sg">+0.214</span>
+        </div>
+        <div class="baseline-stat">
+          <span class="bs-label">Season Earnings</span>
+          <span class="bs-val" data-stat="earn">$3.2M</span>
+        </div>
+        <div class="baseline-stat">
+          <span class="bs-label" data-label="wr">Current World Rank</span>
+          <span class="bs-val" data-stat="rank">#74</span>
+        </div>
+        <div class="baseline-stat">
+          <span class="bs-label">FedEx Pts</span>
+          <span class="bs-val" data-stat="fedex">814</span>
+        </div>
+        <div class="baseline-stat">
+          <span class="bs-label">Events</span>
+          <span class="bs-val">24</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: Sliders -->
+    <div class="sliders-col">
+      <div class="col-header">Adjust Attributes — drag to simulate</div>
+
+      <!-- Each slider card -->
+      <div class="slider-card" id="card-drvDist">
+        <div class="slider-top">
+          <div>
+            <div class="slider-name">Driving Distance</div>
+            <div class="slider-sg-tag">SG: OFF THE TEE</div>
+          </div>
+          <div class="slider-readout">
+            <div class="slider-val" id="val-drvDist">313.8</div>
+            <div class="slider-unit">YARDS</div>
+            <div class="slider-delta-tag" id="dlt-drvDist"></div>
+          </div>
+        </div>
+        <div class="slider-track-area">
+          <div class="slider-bounds"><span>272 yds</span><span>Tour Avg: 305</span><span>335 yds</span></div>
+          <input type="range" class="pos-fill" id="sl-drvDist" min="272" max="335" value="313.8" step="0.1" data-base="305.0" data-player="313.8" data-key="drvDist">
+          <div class="center-tick"></div>
+        </div>
+        <div class="ranking-strip">
+          <span class="rank-label">Tour Rank</span>
+          <div class="rank-display">
+            <span class="rank-value" id="rnk-drvDist">#50</span>
+            <span class="rank-new" id="rarr-drvDist">
+              <span class="rank-new-arrow" id="rarr-icon-drvDist"></span>
+              <span class="rank-new-num" id="rarr-num-drvDist"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-card" id="card-drvAcc">
+        <div class="slider-top">
+          <div>
+            <div class="slider-name">Driving Accuracy</div>
+            <div class="slider-sg-tag">SG: OFF THE TEE</div>
+          </div>
+          <div class="slider-readout">
+            <div class="slider-val" id="val-drvAcc">58.93</div>
+            <div class="slider-unit">% FAIRWAYS</div>
+            <div class="slider-delta-tag" id="dlt-drvAcc"></div>
+          </div>
+        </div>
+        <div class="slider-track-area">
+          <div class="slider-bounds"><span>35%</span><span>Tour Avg: 59.7%</span><span>80%</span></div>
+          <input type="range" class="pos-fill" id="sl-drvAcc" min="35" max="80" value="58.93" step="0.01" data-base="59.69" data-player="58.93" data-key="drvAcc">
+          <div class="center-tick"></div>
+        </div>
+        <div class="ranking-strip">
+          <span class="rank-label">Tour Rank</span>
+          <div class="rank-display">
+            <span class="rank-value" id="rnk-drvAcc">#112</span>
+            <span class="rank-new" id="rarr-drvAcc">
+              <span class="rank-new-arrow" id="rarr-icon-drvAcc"></span>
+              <span class="rank-new-num" id="rarr-num-drvAcc"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-card" id="card-gir">
+        <div class="slider-top">
+          <div>
+            <div class="slider-name">Greens in Regulation</div>
+            <div class="slider-sg-tag">SG: APPROACH</div>
+          </div>
+          <div class="slider-readout">
+            <div class="slider-val" id="val-gir">73.61</div>
+            <div class="slider-unit">% GIR</div>
+            <div class="slider-delta-tag" id="dlt-gir"></div>
+          </div>
+        </div>
+        <div class="slider-track-area">
+          <div class="slider-bounds"><span>55%</span><span>Tour Avg: 69.4%</span><span>78%</span></div>
+          <input type="range" class="pos-fill" id="sl-gir" min="55" max="78" value="73.61" step="0.01" data-base="69.38" data-player="73.61" data-key="gir">
+          <div class="center-tick"></div>
+        </div>
+        <div class="ranking-strip">
+          <span class="rank-label">Tour Rank</span>
+          <div class="rank-display">
+            <span class="rank-value" id="rnk-gir">#78</span>
+            <span class="rank-new" id="rarr-gir">
+              <span class="rank-new-arrow" id="rarr-icon-gir"></span>
+              <span class="rank-new-num" id="rarr-num-gir"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-card" id="card-prox">
+        <div class="slider-top">
+          <div>
+            <div class="slider-name">SG: Putting</div>
+            <div class="slider-sg-tag">SG: PUTTING</div>
+          </div>
+          <div class="slider-readout">
+            <div class="slider-val" id="val-prox">-0.524</div>
+            <div class="slider-unit">STROKES GAINED</div>
+            <div class="slider-delta-tag" id="dlt-prox"></div>
+          </div>
+        </div>
+        <div class="slider-track-area">
+          <div class="slider-bounds"><span>-2.2</span><span>Tour Avg: 0.0</span><span>+2.2</span></div>
+          <input type="range" class="pos-fill" id="sl-prox" min="-2.2" max="2.2" value="-0.524" step="0.001" data-base="0.0" data-player="-0.524" data-key="prox">
+          <div class="center-tick"></div>
+        </div>
+        <div class="ranking-strip">
+          <span class="rank-label">Tour Rank</span>
+          <div class="rank-display">
+            <span class="rank-value" id="rnk-prox">#132</span>
+            <span class="rank-new" id="rarr-prox">
+              <span class="rank-new-arrow" id="rarr-icon-prox"></span>
+              <span class="rank-new-num" id="rarr-num-prox"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-card" id="card-scr">
+        <div class="slider-top">
+          <div>
+            <div class="slider-name">Scrambling %</div>
+            <div class="slider-sg-tag">SG: AROUND THE GREEN</div>
+          </div>
+          <div class="slider-readout">
+            <div class="slider-val" id="val-scr">63.16</div>
+            <div class="slider-unit">% SCRAMBLING</div>
+            <div class="slider-delta-tag" id="dlt-scr"></div>
+          </div>
+        </div>
+        <div class="slider-track-area">
+          <div class="slider-bounds"><span>38%</span><span>Tour Avg: 61.1%</span><span>79%</span></div>
+          <input type="range" class="pos-fill" id="sl-scr" min="38" max="79" value="63.16" step="0.01" data-base="61.07" data-player="63.16" data-key="scr">
+          <div class="center-tick"></div>
+        </div>
+        <div class="ranking-strip">
+          <span class="rank-label">Tour Rank</span>
+          <div class="rank-display">
+            <span class="rank-value" id="rnk-scr">#91</span>
+            <span class="rank-new" id="rarr-scr">
+              <span class="rank-new-arrow" id="rarr-icon-scr"></span>
+              <span class="rank-new-num" id="rarr-num-scr"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="slider-card" id="card-putt">
+        <div class="slider-top">
+          <div>
+            <div class="slider-name">SG: Off the Tee</div>
+            <div class="slider-sg-tag">SG: OFF THE TEE</div>
+          </div>
+          <div class="slider-readout">
+            <div class="slider-val" id="val-putt">0.738</div>
+            <div class="slider-unit">STROKES GAINED</div>
+            <div class="slider-delta-tag" id="dlt-putt"></div>
+          </div>
+        </div>
+        <div class="slider-track-area">
+          <div class="slider-bounds"><span>-3.5</span><span>Tour Avg: 0.0</span><span>+3.5</span></div>
+          <input type="range" class="pos-fill" id="sl-putt" min="-3.5" max="3.5" value="0.738" step="0.001" data-base="0.0" data-player="0.738" data-key="putt">
+          <div class="center-tick"></div>
+        </div>
+        <div class="ranking-strip">
+          <span class="rank-label">Tour Rank</span>
+          <div class="rank-display">
+            <span class="rank-value" id="rnk-putt">#31</span>
+            <span class="rank-new" id="rarr-putt">
+              <span class="rank-new-arrow" id="rarr-icon-putt"></span>
+              <span class="rank-new-num" id="rarr-num-putt"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div class="results-col">
+
+      <!-- Big number -->
+      <div class="impact-hero">
+        <div class="impact-label">Projected Change</div>
+        <div class="impact-number" id="impact-num">±0.00</div>
+        <div class="impact-sub">STROKES PER ROUND</div>
+      </div>
+
+      <!-- SG bars -->
+      <div class="sg-section">
+        <div class="sg-section-label">Strokes Gained Breakdown</div>
+        <div class="sg-row">
+          <div class="sg-name">Off the Tee</div>
+          <div class="sg-track"><div class="sg-fill" id="bar-ott" style="width:55%"></div></div>
+          <div class="sg-num" id="num-ott">+0.42</div>
+        </div>
+        <div class="sg-row">
+          <div class="sg-name">Approach</div>
+          <div class="sg-track"><div class="sg-fill" id="bar-app" style="width:65%"></div></div>
+          <div class="sg-num" id="num-app">+0.61</div>
+        </div>
+        <div class="sg-row">
+          <div class="sg-name">Around Green</div>
+          <div class="sg-track"><div class="sg-fill" id="bar-atg" style="width:35%"></div></div>
+          <div class="sg-num" id="num-atg">−0.08</div>
+        </div>
+        <div class="sg-row">
+          <div class="sg-name">Putting</div>
+          <div class="sg-track"><div class="sg-fill" id="bar-put" style="width:45%"></div></div>
+          <div class="sg-num" id="num-put">+0.22</div>
+        </div>
+      </div>
+
+      <!-- Stat rows -->
+      <div class="stat-rows">
+        <div class="stat-row">
+          <span class="stat-label">SG: Total</span>
+          <div class="stat-right">
+            <div class="stat-value" id="rv-sg">+0.214</div>
+            <div class="stat-change" id="rc-sg">—</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Scoring Avg</span>
+          <div class="stat-right">
+            <div class="stat-value" id="rv-score">70.967</div>
+            <div class="stat-change" id="rc-score">—</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">World Ranking</span>
+          <div class="stat-right">
+            <div class="stat-value" id="rv-rank">#74</div>
+            <div class="stat-change" id="rc-rank">—</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Season Earnings</span>
+          <div class="stat-right">
+            <div class="stat-value" id="rv-earn">$3.2M</div>
+            <div class="stat-change" id="rc-earn">—</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">FedEx Cup Pts</span>
+          <div class="stat-right">
+            <div class="stat-value" id="rv-fedex">814</div>
+            <div class="stat-change" id="rc-fedex">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="results-footer">
+        <span class="share-label">Share scenario</span>
+        <button class="share-btn" id="share-btn">COPY LINK</button>
+      </div>
+
+    </div>
+  </div>
+
+
+<!-- No Data Modal -->
+<div class="nodata-overlay" id="nodata-overlay">
+  <div class="nodata-modal">
+    <div class="nodata-eyebrow">No Data Available</div>
+    <div class="nodata-title" id="nodata-title">No data for this season</div>
+    <div class="nodata-body" id="nodata-body">This player doesn't have data for the selected season. Choose an available season below.</div>
+    <div class="nodata-season-list" id="nodata-season-list"></div>
+    <button class="nodata-cancel" id="nodata-cancel">CANCEL</button>
+  </div>
+</div>
+
+<!-- Season Change Modal -->
+<div class="modal-overlay" id="season-modal">
+  <div class="modal">
+    <div class="modal-eyebrow">Changing Season</div>
+    <div class="modal-title" id="modal-title">Switch to 2023–24?</div>
+    <div class="modal-body">
+      You have active adjustments on the current season. Would you like to <strong>keep your changes</strong> and apply them to the new season, or <strong>reset to defaults</strong> for the selected season?
+    </div>
+    <div class="modal-deltas-preview" id="modal-deltas-preview">
+      <div class="modal-delta-label">Your current adjustments</div>
+      <div id="modal-delta-rows"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-keep" id="modal-keep">Keep Changes</button>
+      <button class="modal-btn modal-btn-reset" id="modal-reset">Reset to Defaults</button>
+      <button class="modal-btn modal-btn-cancel" id="modal-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+</div>
