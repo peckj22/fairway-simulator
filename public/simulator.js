@@ -1279,28 +1279,29 @@ function showDropdown(players, query) {
 
 
   // ── Welcome Modal ─────────────────────────────────────────
-  (function() {
+  setTimeout(function() {
     const overlay = document.getElementById('welcome-overlay');
     const btn     = document.getElementById('welcome-btn');
     if (!overlay || !btn) return;
 
-    // Check if user has seen it before using localStorage
-    const seen = localStorage.getItem('fairway-welcome-seen');
-    if (seen) {
-      overlay.classList.add('hidden');
+    // Hide immediately if already seen
+    try {
+      if (localStorage.getItem('fairway-welcome-seen')) {
+        overlay.style.display = 'none';
+        return;
+      }
+    } catch(e) {}
+
+    function dismiss() {
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => { overlay.style.display = 'none'; }, 300);
+      try { localStorage.setItem('fairway-welcome-seen', '1'); } catch(e) {}
     }
 
-    btn.addEventListener('click', () => {
-      overlay.style.animation = 'fadeOut 0.3s ease forwards';
-      setTimeout(() => overlay.classList.add('hidden'), 280);
-      localStorage.setItem('fairway-welcome-seen', '1');
-    });
-
-    // Also close on backdrop click
-    overlay.addEventListener('click', e => {
-      if (e.target === overlay) btn.click();
-    });
-  })();
+    btn.addEventListener('click', dismiss);
+    overlay.addEventListener('click', e => { if (e.target === overlay) dismiss(); });
+  }, 200);
 
   // Auto-load the current world #1 player on startup
   (async () => {
