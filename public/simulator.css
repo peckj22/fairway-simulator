@@ -431,7 +431,7 @@
     font-family: 'DM Mono', monospace;
     font-size: 13px;
     color: var(--text2);
-    transition: color 0.25s;
+    transition: color 0.3s;
   }
   .rank-value.top10  { color: #e8c96a; }
   .rank-value.top25  { color: var(--green-light); }
@@ -458,7 +458,7 @@
     font-family: 'DM Mono', monospace;
     font-size: 13px;
     font-weight: 500;
-    transition: color 0.25s;
+    transition: color 0.3s;
   }
   .rank-new-num.up   { color: var(--green-light); }
   .rank-new-num.down { color: var(--red); }
@@ -559,10 +559,8 @@
     width: 38px;
     text-align: right;
     flex-shrink: 0;
-    transition: color 0.25s;
+    transition: color 0.3s;
   }
-  .sg-num.pos { color: var(--green-light); }
-  .sg-num.neg { color: var(--red); }
 
   /* Stat rows */
   .stat-rows {
@@ -607,7 +605,7 @@
     color: transparent;
     margin-top: 2px;
     min-height: 13px;
-    transition: color 0.25s;
+    transition: color 0.3s;
   }
   .stat-change.pos { color: var(--green-light); }
   .stat-change.neg { color: var(--red); }

@@ -102,8 +102,8 @@
 // Tour averages — used as center reference on sliders (real 2025-26 PGA Tour data)
   const TOUR_AVG = { drvDist:305.0, drvAcc:59.69, gir:69.38, prox:0.0, scr:61.07, putt:0.0 }; // keys match slider DOM ids
   // Keith Mitchell's actual 2025-26 stats (real PGA Tour data)
-  const BASE = { drvDist:313.8, drvAcc:58.93, gir:73.61, sgPutt:-0.524, scr:63.16, sgOtt:0.738 };
-  const SG0  = { ott:0.738, app:0.076, atg:0.000, put:-0.524 };  // real 2025-26 values
+  const BASE = { drvDist:313.8, drvAcc:58.93, gir:73.61, sgPutt:-0.524, scr:63.16 };
+  const SG0  = { ott:0.000, app:0.000, atg:0.000, put:0.000 };  // baseline: deltas computed from W × raw stat changes
 
   // PLAYER_BASE tracks the current player's real baseline stats for update() calculations
   const PLAYER_BASE = {
@@ -113,7 +113,10 @@
     earn:    3.1e6,
     fedex:   720,
   };
-  const INVERSE = { sgPutt: false, sgOtt: false };  // higher SG = better for all
+
+  // PLAYER_SG stores the player's real per-category SG values for baseline bar display
+  const PLAYER_SG = { ott: 0.0, app: 0.0, atg: 0.0, put: 0.0 };
+  const INVERSE = { sgPutt: false };  // higher SG = better for all
 
   // Ranking interpolation curves: [statValue, tourRank]
   // Approximate 2024-25 PGA Tour distributions (~200 players)
@@ -154,17 +157,19 @@
   for (const k in BASE) BASE_RANKS[k] = interpolateRank(k, BASE[k]);
   // Also init slider-key aliases
   BASE_RANKS['prox'] = BASE_RANKS['sgPutt'];
-  BASE_RANKS['putt'] = BASE_RANKS['sgOtt'];
-
   // SG weights: how each stat delta maps to SG categories
   // Based on Broadie research — 1 unit change in stat = X change in SG category
   const W = {
-    drvDist: { ott: 0.006, app: 0.003  },  // per yard: +10 yds ≈ +0.06 SG:OTT
-    drvAcc:  { ott: 0.008, app: 0.002  },  // per 1% fairway hit
-    gir:     { app: 0.018, atg: 0.004  },  // per 1% GIR
-    sgPutt:  { put: 1.0                },  // direct: sgPutt IS the putting SG delta
-    scr:     { atg: 0.010              },  // per 1% scrambling
-    sgOtt:   { ott: 1.0                },  // direct: sgOtt IS the off-the-tee SG delta
+    // Raw stats → SG categories (research-based coefficients)
+    // +10 yds driving distance ≈ +0.06 SG:OTT (PGA Tour data)
+    // +1% fairway accuracy ≈ +0.02 SG:OTT
+    // +1% GIR ≈ +0.06 SG:APP
+    // +1% scrambling ≈ +0.03 SG:ATG
+    drvDist: { ott: 0.006, app: 0.002  },
+    drvAcc:  { ott: 0.020, app: 0.003  },
+    gir:     { app: 0.060, atg: 0.004  },
+    sgPutt:  { put: 1.0                },
+    scr:     { atg: 0.030              },
   };
 
   // Slider DOM IDs → BASE keys mapping
@@ -172,9 +177,8 @@
     drvDist: 'drvDist',
     drvAcc:  'drvAcc',
     gir:     'gir',
-    prox:    'sgPutt',   // slider id 'prox' maps to sgPutt
+    prox:    'sgPutt',
     scr:     'scr',
-    putt:    'sgOtt',    // slider id 'putt' maps to sgOtt
   };
 
   function deltas() {
@@ -211,13 +215,44 @@
   function fmt(n, dec=2) { return (n >= 0 ? '+' : '−') + Math.abs(n).toFixed(dec); }
   function pct(val, min, max) { return Math.max(2, Math.min(98, ((val - min) / (max - min)) * 100)); }
 
+  function sgColor(val) {
+    // Map SG value to a color on a gradient:
+    // <= -1.0  : dark red    #7a1a1a
+    // -0.5     : mid red     #b34040
+    // 0.0      : neutral     #8aab96 (text2)
+    // +0.5     : mid green   #2db36a
+    // >= +1.0  : bright gold #c9a84c
+    const stops = [
+      { v: -1.5, r: 80,  g: 20,  b: 20  },
+      { v: -0.5, r: 160, g: 50,  b: 50  },
+      { v:  0.0, r: 138, g: 171, b: 150 },
+      { v:  0.7, r: 45,  g: 179, b: 106 },
+      { v:  1.5, r: 10,  g: 220, b: 80  },
+    ];
+    const clamped = Math.max(stops[0].v, Math.min(stops[stops.length-1].v, val));
+    for (let i = 0; i < stops.length - 1; i++) {
+      const a = stops[i], b = stops[i+1];
+      if (clamped >= a.v && clamped <= b.v) {
+        const t = (clamped - a.v) / (b.v - a.v);
+        const r = Math.round(a.r + t * (b.r - a.r));
+        const g = Math.round(a.g + t * (b.g - a.g));
+        const bb = Math.round(a.b + t * (b.b - a.b));
+        return `rgb(${r},${g},${bb})`;
+      }
+    }
+    return '#8aab96';
+  }
+
   function updateBar(id, val) {
     const fill = document.getElementById('bar-' + id);
     const num  = document.getElementById('num-' + id);
     fill.style.width = pct(val, -1.5, 1.5) + '%';
     fill.classList.toggle('neg', val < 0);
+    const color = sgColor(val);
+    fill.style.background = color;
     num.textContent = fmt(val);
-    num.className = 'sg-num' + (val > 0.01 ? ' pos' : val < -0.01 ? ' neg' : '');
+    num.style.color = color;
+    num.className = 'sg-num';
   }
 
   function setStatRow(id, value, change, dir) {
@@ -234,7 +269,7 @@
   }
 
   // Map base keys back to slider DOM ids for element lookup
-  const BASE_KEY_TO_SLIDER = { sgPutt: 'prox', sgOtt: 'putt' };
+  const BASE_KEY_TO_SLIDER = { sgPutt: 'prox' };
 
   function updateRankDisplay(key, newRank) {
     const domKey = BASE_KEY_TO_SLIDER[key] || key;  // resolve to slider DOM id
@@ -262,6 +297,7 @@
   }
 
   function update() {
+    if (!document.getElementById('impact-num')) return; // DOM not ready yet
     const d = deltas();
     const sg = computeSG(d);
     const sgTotal = sg.ott + sg.app + sg.atg + sg.put;
@@ -306,7 +342,7 @@
     const key = slider.dataset.key;
     const baseKey = SLIDER_KEY_MAP[key] || key;
     const playerStat = BASE[baseKey];  // player's actual stat
-    const STAT_DEC = { drvDist: 1, drvAcc: 2, gir: 2, scr: 2, sgPutt: 3, sgOtt: 3 };
+    const STAT_DEC = { drvDist: 1, drvAcc: 2, gir: 2, scr: 2, sgPutt: 3 };
     const dec = STAT_DEC[baseKey] ?? (Math.abs(playerStat) < 10 ? 3 : playerStat < 100 ? 2 : 1);
     const valEl = document.getElementById('val-' + key);
     const dltEl = document.getElementById('dlt-' + key);
@@ -356,6 +392,7 @@
   document.getElementById('share-btn').addEventListener('click', () => {
     navigator.clipboard.writeText(window.location.href).catch(()=>{});
     const b = document.getElementById('share-btn');
+    if (!b) return;
     b.textContent = 'COPIED!';
     setTimeout(() => b.textContent = 'COPY LINK', 2000);
   });
@@ -734,7 +771,9 @@
       { id: '103',   key: 'gir',     sgKey: null },
       { id: '130',   key: 'scr',     sgKey: null },
       { id: '02564', key: null,      sgKey: 'sgPutt', sliderKey: 'prox' },
-      { id: '02674', key: null,      sgKey: 'sgOtt',  sliderKey: 'putt' },
+      { id: '02674', key: null,      sgKey: 'sgOtt',  sliderKey: null   },
+      { id: '02567', key: null,      sgKey: 'sgApp',  sliderKey: null   },
+      { id: '02568', key: null,      sgKey: 'sgAtg',  sliderKey: null   },
       { id: '02675', key: 'sgTotal', sgKey: null },
       { id: '120',   key: 'score',   sgKey: null },
     ];
@@ -784,19 +823,17 @@
     if (stats.gir      !== undefined) BASE.gir      = stats.gir;
     if (stats.scr      !== undefined) BASE.scr      = stats.scr;
     if (stats.sgPutt   !== undefined) BASE.sgPutt   = stats.sgPutt;
-    if (stats.sgOtt    !== undefined) BASE.sgOtt    = stats.sgOtt;
+    // SG0 stays zero — all bars show change from player's baseline
 
-    // Update SG0
-    SG0.ott = stats.sgOtt  ?? 0;
-    SG0.app = 0;
-    SG0.atg = 0;
-    SG0.put = stats.sgPutt ?? 0;
+    // Store real SG values for bar display
+    PLAYER_SG.ott = stats.sgOtt   ?? 0;
+    PLAYER_SG.app = stats.sgApp   ?? 0;
+    PLAYER_SG.atg = stats.sgAtg   ?? 0;
+    PLAYER_SG.put = stats.sgPutt  ?? 0;
 
     // Update BASE_RANKS
     for (const k in BASE) BASE_RANKS[k] = interpolateRank(k, BASE[k]);
     BASE_RANKS['prox'] = BASE_RANKS['sgPutt'];
-    BASE_RANKS['putt'] = BASE_RANKS['sgOtt'];
-
     // Update player card
     const names = player.displayName.split(' ');
     const firstName = names.slice(0, -1).join(' ');
@@ -1280,28 +1317,21 @@ function showDropdown(players, query) {
 
   // ── Welcome Modal ─────────────────────────────────────────
   setTimeout(function() {
-    const overlay = document.getElementById('welcome-overlay');
-    const btn     = document.getElementById('welcome-btn');
-    if (!overlay || !btn) return;
+    var overlay = document.getElementById('welcome-overlay');
+    var btn     = document.getElementById('welcome-btn');
+    if (!overlay || !btn) { console.warn('welcome elements not found'); return; }
 
-    // Hide immediately if already seen
-    try {
-      if (localStorage.getItem('fairway-welcome-seen')) {
-        overlay.style.display = 'none';
-        return;
-      }
-    } catch(e) {}
+    try { if (localStorage.getItem('fairway-welcome-seen')) { overlay.style.display = 'none'; return; } } catch(e) {}
 
-    function dismiss() {
-      overlay.style.opacity = '0';
-      overlay.style.transition = 'opacity 0.3s ease';
-      setTimeout(() => { overlay.style.display = 'none'; }, 300);
+    function dismissWelcome() {
+      overlay.style.display = 'none';
       try { localStorage.setItem('fairway-welcome-seen', '1'); } catch(e) {}
     }
 
-    btn.addEventListener('click', dismiss);
-    overlay.addEventListener('click', e => { if (e.target === overlay) dismiss(); });
-  }, 200);
+    btn.onclick = dismissWelcome;
+    overlay.onclick = function(e) { if (e.target === overlay) dismissWelcome(); };
+    console.log('Welcome modal ready, btn:', btn);
+  }, 300);
 
   // Auto-load the current world #1 player on startup
   (async () => {
